@@ -1,0 +1,64 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+#define N 6
+
+int main() {
+    int graph[N][N] = {
+        {0, 1, 1, 0, 0, 0},
+        {1, 0, 1, 0, 0, 0},
+        {1, 1, 0, 1, 0, 0},
+        {0, 0, 1, 0, 1, 1},
+        {0, 0, 0, 1, 0, 1},
+        {0, 0, 0, 1, 1, 0}
+    };
+
+    int packets = 10, delivered = 0, dropped = 0;
+    int i, j;
+    float errorRate, dataRate;
+    float packetSize = 1000;
+    float totalTime, throughput;
+
+    srand(time(0));
+
+    printf("Enter error rate (0-100): ");
+    scanf("%f", &errorRate);
+
+    printf("Enter data rate (Mbps): ");
+    scanf("%f", &dataRate);
+
+    printf("\nEthernet LAN with 6 nodes:\n");
+    for (i = 0; i < N; i++) {
+        printf("Node %d connected to: ", i);
+        for (j = 0; j < N; j++) {
+            if (graph[i][j])
+                printf("%d ", j);
+        }
+        printf("\n");
+    }
+
+    printf("\nPacket Transmission:\n");
+    for (i = 0; i < packets; i++) {
+        printf("Packet %d: ", i + 1);
+        if ((rand() % 100) >= errorRate) {
+            printf("Delivered\n");
+            delivered++;
+        } else {
+            printf("Dropped\n");
+            dropped++;
+        }
+    }
+
+    totalTime = (packets * packetSize * 8) / (dataRate * 1000000);
+    throughput = (delivered * packetSize * 8) / (totalTime * 1000000);
+
+    printf("\nTotal packets: %d", packets);
+    printf("\nPackets delivered: %d", delivered);
+    printf("\nPackets dropped: %d", dropped);
+    printf("\nError rate: %.2f%%", errorRate);
+    printf("\nData rate: %.2f Mbps", dataRate);
+    printf("\nThroughput: %.4f Mbps\n", throughput);
+
+    return 0;
+}

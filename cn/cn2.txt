@@ -1,0 +1,52 @@
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
+
+#define MOD_ADLER 65521
+
+uint32_t adler32(const unsigned char *data) {
+    uint32_t csum1 = 1;
+    uint32_t csum2 = 0;
+    size_t i;
+    int len = strlen((const char *)data);
+
+    printf("Data length: %d\n", len);
+
+    for (i = 0; i < len; i++) {
+        csum1 = (csum1 + data[i]) % MOD_ADLER;
+        csum2 = (csum2 + csum1) % MOD_ADLER;
+    }
+
+    return (csum2 << 16) | csum1;
+}
+
+uint16_t fletcher16(const uint8_t *data) {
+    uint16_t csum1 = 0;
+    uint16_t csum2 = 0;
+    size_t i;
+    int len = strlen((const char *)data);
+
+    printf("Data length: %d\n", len);
+
+    for (i = 0; i < len; i++) {
+        csum1 = (csum1 + data[i]) % 255;
+        csum2 = (csum2 + csum1) % 255;
+    }
+
+    return (csum2 << 8) | csum1;
+}
+
+int main() {
+    uint8_t data[40];
+
+    printf("Enter the data (up to 40 characters): ");
+    scanf("%39s", data);
+
+    uint32_t adler = adler32(data);
+    uint16_t fletch = fletcher16(data);
+
+    printf("Adler checksum for \"%s\" is 0x%08x\n", data, adler);
+    printf("Fletcher checksum for \"%s\" is 0x%04x\n", data, fletch);
+
+    return 0;
+}

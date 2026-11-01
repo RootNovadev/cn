@@ -1,0 +1,119 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+long int gcd(long int a, long int b) {
+    if (b == 0)  
+        return a;
+    return gcd(b, a % b);
+}
+
+long int isprime(long int a) {
+    if (a <= 1)  
+        return 0;
+    if (a == 2)  
+        return 1;
+    if (a % 2 == 0)  
+        return 0;
+    for (long int i = 3; i * i <= a; i += 2) {
+        if (a % i == 0)  
+            return 0;
+    }
+    return 1;
+}
+
+long int modexp(long int base, long int exp, long int mod) {
+    long int result = 1;
+    base = base % mod;
+    while (exp > 0) {
+        if (exp % 2 == 1)
+            result = (result * base) % mod;
+        base = (base * base) % mod;
+        exp = exp / 2;
+    }
+    return result;
+}
+
+long int modInverse(long int e, long int phi) {
+    long int t = 0, newt = 1;
+    long int r = phi, newr = e;
+    long int q, temp;
+    while (newr != 0) {
+        q = r / newr;
+        temp = t; 
+        t = newt; 
+        newt = temp - q * newt;
+        temp = r; 
+        r = newr; 
+        newr = temp - q * newr;
+    }
+    if (r > 1) 
+        return -1;
+    if (t < 0) 
+        t += phi;
+    return t;
+}
+
+long int encryptChar(char ch, long int e, long int n) {
+    return modexp((long int)ch, e, n);
+}
+
+char decryptChar(long int cipher, long int d, long int n) {
+    return (char)modexp(cipher, d, n);
+}
+
+int main() {
+    srand(time(NULL));
+    long int p, q, n, phi, e, d;
+    char text;
+    long int cipher;
+    int len, i;
+
+    printf("Enter text to be encrypted: ");
+    fgets(text, sizeof(text), stdin);
+    len = strlen(text);
+    if (text[len - 1] == '\n') {
+        text[len - 1] = '\0';
+        len = strlen(text);
+    }
+
+    do {
+        p = rand() % 900 + 100;
+    } while (!isprime(p));
+
+    do {
+        q = rand() % 900 + 100;
+    } while (!isprime(q) || p == q);
+
+    n = p * q;
+    phi = (p - 1) * (q - 1);
+
+    do {
+        e = rand() % (phi - 2) + 2;
+    } while (gcd(e, phi) != 1);
+
+    d = modInverse(e, phi);
+
+    printf("\nGenerated Primes: p = %ld, q = %ld\n", p, q);
+    printf("n = %ld, phi = %ld\n", n, phi);
+    printf("Public Key (n, e) = (%ld, %ld)\n", n, e);
+    printf("Private Key (n, d) = (%ld, %ld)\n", n, d);
+
+    for (i = 0; i < len; i++) {
+        cipher[i] = encryptChar(text[i], e, n);
+    }
+
+    printf("\nEncrypted Message: ");
+    for (i = 0; i < len; i++) {
+        printf("%ld ", cipher[i]);
+    }
+
+    printf("\nDecrypted Message: ");
+    for (i = 0; i < len; i++) {
+        printf("%c", decryptChar(cipher[i], d, n));
+    }
+
+    printf("\n");
+    return 0;
+}

@@ -1,0 +1,42 @@
+#include <stdio.h>
+
+#define N 6
+
+int main() {
+    int graph[N][N] = {
+        {0, 0, 1, 0, 0, 0},
+        {0, 0, 1, 0, 0, 0},
+        {1, 1, 0, 1, 0, 0},
+        {0, 0, 1, 0, 1, 1},
+        {0, 0, 0, 1, 0, 0},
+        {0, 0, 0, 1, 0, 0}
+    };
+
+    int packets = 10, dropped = 0;
+    int i, j;
+
+    printf("Network topology with 6 nodes:\n");
+    for (i = 0; i < N; i++) {
+        printf("Node %d is connected to: ", i);
+        for (j = 0; j < N; j++) {
+            if (graph[i][j])
+                printf("%d ", j);
+        }
+        printf("\n");
+    }
+
+    printf("\nPing message transmission:\n");
+    for (i = 0; i < packets; i++) {
+        printf("Ping packet %d: ", i + 1);
+        if (graph[0][2] && graph[2][3] && graph[3][5]) {
+            printf("Node 0 -> Node 2 -> Node 3 -> Node 5 : Delivered\n");
+        } else {
+            printf("Dropped\n");
+            dropped++;
+        }
+    }
+
+    printf("\nNumber of packets dropped is: %d\n", dropped);
+
+    return 0;
+}
